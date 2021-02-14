@@ -1,0 +1,60 @@
+version: "3.7"
+
+#DOCKER NETWORKS
+networks:
+  webapp-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+
+services:
+  #PHP Service
+  app:
+    container_name: webapp
+    build:
+      args:
+        user: dave
+        uid: 1000
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    tty: true
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    networks:
+      - webapp-network
+
+  #NGINX Service
+  webserver:
+    container_name: nginx-webapp
+    image: nginx
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - webapp-network
+
+  #MYSQL service
+  db:
+    image: mysql:5.7
+    container_name: mysql-webapp
+    restart: unless-stopped
+    tty: true
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql/
+    ports:
+      - "3306:3306"
+    networks:
+      - webapp-network
