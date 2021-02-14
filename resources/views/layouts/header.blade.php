@@ -5,7 +5,7 @@
         <!-- Mobile hamburger -->
         <button
             class="p-1 mr-5 -ml-1 rounded-md md:hidden focus:outline-none focus:shadow-outline-blue"
-            @click="toggleSideMenu"
+            @click="isSideBarMenu"
             aria-label="Menu"
         >
             <svg
